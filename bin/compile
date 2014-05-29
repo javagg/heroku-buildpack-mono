@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir>
+
+# fail fast
+set -e 
+
+MONO_VERSION="3.4.0"
+XSP_VERSION="3.0.11"
+
+MONO_RT_DOWNLOAD_URL="http://heroku-buildpacks.qiniudn.com/mono-rt-${MONO_VERSION}.tar.bz2"
+
+# Configure directories
+BUILD_DIR=$1
+CACHE_DIR=$2
+ENV_DIR=$3
+BP_DIR=$(cd $(dirname $0); cd ..; pwd)
+
+MONO_RT_DIR=${CACHE_DIR}/mono-${MONO_VERSION}
+
+indent() {
+  sed -u 's/^/       /'
+}
+
+if [ ! -d ${MONO_RT_DIR} ]; then
+  rm -rf ${MONO_RT_DIR}
+  mkdir -p ${MONO_RT_DIR}
+  echo "-----> Downloading ${MONO_RT_DOWNLOAD_URL}"
+  curl ${MONO_RT_DOWNLOAD_URL} -s | tar xz -C ${MONO_RT_DIR}
+fi
+
+cp -r "${MONO_RT_DIR}/mono" .
+
+# find a solution file
+SLN=$(find . -maxdepth 1 -iname "*.sln")
+if [ $( echo "${SLN}" | wc -l ) -gt 1 ]; then
+  echo "-----> Too many *.sln files"
+  exit 1
+fi
+
+if [ "${SLN}" == "" ]; then
+  echo "-----> No *.sln file found"
+  exit 1
+fi
+
+echo "-----> Compiling Mono application"
+
+export PATH="/app/mono/bin:${PATH}"
+export LD_LIBRARY_PATH="/app/mono/lib:${LD_LIBRARY_PATH}"
+
+BUILD_CACHE_DIR=${CACHE_DIR}/build/
+mkdir -p ${BUILD_CACHE_DIR}
+
+xbuild /property:Configuration=Release /property:OutDir=${BUILD_CACHE_DIR} ${SLN}
+
+cp -r ${BUILD_CACHE_DIR}* ${BUILD_DIR}
+
+echo "-----> Build SUCCESS"
