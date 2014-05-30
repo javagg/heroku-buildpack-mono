@@ -7,9 +7,16 @@ set -e
 # if any command in a pipe fails, kill the script (useful for indent)
 set -o pipefail
 
+arrow() {
+  while read line; do
+    echo "-----> ${line}"
+  done
+}
 
 indent() {
-  sed -u 's/^/       /'
+  while read line; do
+    echo "       ${line}"
+  done
 }
 
 MONO_VERSION="3.4.0"
@@ -58,13 +65,9 @@ ln -s "${MONO_RT_DIR}" /app
 export PATH="/app/mono/bin:${PATH}"
 export LD_LIBRARY_PATH="/app/mono/lib:${LD_LIBRARY_PATH}"
 
-ls /app/mono/bin
-ls /app/mono/lib
-
-
 BUILD_CACHE_DIR=${CACHE_DIR}/build/
 mkdir -p ${BUILD_CACHE_DIR}
-EnableNuGetPackageRestore=true xbuild /property:Configuration=Release /property:OutDir=${BUILD_CACHE_DIR} ${SLN}
+xbuild /property:Configuration=Release /property:OutDir=${BUILD_CACHE_DIR} ${SLN} | indent
 cp -r ${BUILD_CACHE_DIR}* ${BUILD_DIR}
 
 echo "-----> Build SUCCESS"
