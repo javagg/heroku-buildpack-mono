@@ -36,7 +36,7 @@ if [ ! -d ${MONO_RT_DIR} ]; then
   curl ${MONO_RT_DOWNLOAD_URL} --silent | tar xj -C ${CACHE_DIR}
 fi
 
-ln -sf "${MONO_RT_DIR}" .
+#ln -sf "${MONO_RT_DIR}" .
 
 echo "[INFO] MONO_RT_DIR: ${MONO_RT_DIR}"
 
@@ -54,16 +54,13 @@ fi
 
 echo "-----> Compiling Mono application"
 
-ln -sf "${MONO_RT_DIR}" /app
-
+ln -s "${MONO_RT_DIR}" /app
 export PATH="/app/mono/bin:${PATH}"
 export LD_LIBRARY_PATH="/app/mono/lib:${LD_LIBRARY_PATH}"
 
 BUILD_CACHE_DIR=${CACHE_DIR}/build/
 mkdir -p ${BUILD_CACHE_DIR}
-
-xbuild /property:Configuration=Release /property:OutDir=${BUILD_CACHE_DIR} ${SLN}
-
+EnableNuGetPackageRestore=true xbuild /property:Configuration=Release /property:OutDir=${BUILD_CACHE_DIR} ${SLN}
 cp -r ${BUILD_CACHE_DIR}* ${BUILD_DIR}
 
 echo "-----> Build SUCCESS"
