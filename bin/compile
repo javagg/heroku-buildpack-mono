@@ -4,24 +4,31 @@
 # fail fast
 set -e 
 
+# if any command in a pipe fails, kill the script (useful for indent)
+set -o pipefail
+
+
+indent() {
+  sed -u 's/^/       /'
+}
+
 MONO_VERSION="3.4.0"
 XSP_VERSION="3.0.11"
-
 MONO_RT_DOWNLOAD_URL="http://heroku-buildpacks.qiniudn.com/mono-rt-${MONO_VERSION}.tar.bz2"
-
-# Configure directories
 BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
 BP_DIR=$(cd $(dirname $0); cd ..; pwd)
 
+echo "[INFO] BUILD_DIR: ${BUILD_DIR}"
+echo "[INFO] CACHE_DIR: ${CACHE_DIR}"
+echo "[INFO] ENV_DIR: ${ENV_DIR}"
+echo "[INFO] BP_DIR: ${BP_DIR}"
+echo "[INFO] PWD: ${PWD}"
+
 # cache may not exist yet
 mkdir -p ${CACHE_DIR}
 MONO_RT_DIR=${CACHE_DIR}/mono
-
-indent() {
-  sed -u 's/^/       /'
-}
 
 if [ ! -d ${MONO_RT_DIR} ]; then
   rm -rf ${MONO_RT_DIR}
@@ -30,6 +37,10 @@ if [ ! -d ${MONO_RT_DIR} ]; then
 fi
 
 ln -sf "${MONO_RT_DIR}" .
+
+echo "[INFO] MONO_RT_DIR: ${MONO_RT_DIR}"
+
+ls .
 
 # find a solution file
 SLN=$(find . -maxdepth 1 -iname "*.sln")
