@@ -40,10 +40,8 @@ ln -sf "${MONO_RT_DIR}" .
 
 echo "[INFO] MONO_RT_DIR: ${MONO_RT_DIR}"
 
-ls .
-
 # find a solution file
-SLN=$(find . -maxdepth 1 -iname "*.sln")
+SLN=$(find $BUILD_DIR -maxdepth 1 -iname "*.sln")
 if [ $( echo "${SLN}" | wc -l ) -gt 1 ]; then
   echo "-----> Too many *.sln files"
   exit 1
