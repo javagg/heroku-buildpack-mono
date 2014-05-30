@@ -5,7 +5,8 @@ BUILD_DIR=$1
 
 cat <<EOF
 ---
+config_vars:
+  PATH: /app/mono/bin:/usr/local/bin:/usr/bin:/bin
 default_process_types:
-#web: /app/mono/bin/start
+  web: /app/xsp/bin/xsp4 --nonstop --port \$PORT --root "$WEB_ROOT"
 EOF
-fi

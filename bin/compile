@@ -15,7 +15,9 @@ CACHE_DIR=$2
 ENV_DIR=$3
 BP_DIR=$(cd $(dirname $0); cd ..; pwd)
 
-MONO_RT_DIR=${CACHE_DIR}/mono-${MONO_VERSION}
+# cache may not exist yet
+mkdir -p ${CACHE_DIR}
+MONO_RT_DIR=${CACHE_DIR}/mono
 
 indent() {
   sed -u 's/^/       /'
@@ -23,12 +25,11 @@ indent() {
 
 if [ ! -d ${MONO_RT_DIR} ]; then
   rm -rf ${MONO_RT_DIR}
-  mkdir -p ${MONO_RT_DIR}
   echo "-----> Downloading ${MONO_RT_DOWNLOAD_URL}"
-  curl ${MONO_RT_DOWNLOAD_URL} -s | tar xz -C ${MONO_RT_DIR}
+  curl ${MONO_RT_DOWNLOAD_URL} --silent | tar xj -C ${CACHE_DIR}
 fi
 
-cp -r "${MONO_RT_DIR}/mono" .
+ln -sf "${MONO_RT_DIR}" .
 
 # find a solution file
 SLN=$(find . -maxdepth 1 -iname "*.sln")
@@ -43,6 +44,8 @@ if [ "${SLN}" == "" ]; then
 fi
 
 echo "-----> Compiling Mono application"
+
+ln -sf "${MONO_RT_DIR}" /app
 
 export PATH="/app/mono/bin:${PATH}"
 export LD_LIBRARY_PATH="/app/mono/lib:${LD_LIBRARY_PATH}"
