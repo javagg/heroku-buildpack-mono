@@ -58,6 +58,10 @@ ln -s "${MONO_RT_DIR}" /app
 export PATH="/app/mono/bin:${PATH}"
 export LD_LIBRARY_PATH="/app/mono/lib:${LD_LIBRARY_PATH}"
 
+ls /app/mono/bin
+ls /app/mono/lib
+
+
 BUILD_CACHE_DIR=${CACHE_DIR}/build/
 mkdir -p ${BUILD_CACHE_DIR}
 EnableNuGetPackageRestore=true xbuild /property:Configuration=Release /property:OutDir=${BUILD_CACHE_DIR} ${SLN}
