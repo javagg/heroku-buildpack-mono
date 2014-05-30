@@ -8,5 +8,5 @@ It uses Mono 3.4.0.
 
 Example usage:
 
-    $ heroku create --buildpack http://github.com/friism/heroku-buildpack-mono.git
+    $ heroku create --buildpack http://github.com/javagg/heroku-buildpack-mono.git
     $ git push heroku master
